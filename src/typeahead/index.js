@@ -123,9 +123,23 @@ var Typeahead = React.createClass({
 
   _onTextEntryUpdated: function() {
     var value = this.refs.entry.getDOMNode().value;
-    this.setState({visible: this.getOptionsForValue(value, this.state.options),
+    var options=this.state.options;
+    if (this.props.source != undefined){
+      var url = this.props.source.replace("{value}", value);
+      $.ajax({ 
+        async: false, 
+        type : "GET", 
+        url : url, 
+        dataType : 'json', 
+        success : function(data) { 
+          options=data;
+        }
+      });
+    }
+    this.setState({visible: this.getOptionsForValue(value, options),
                    selection: null,
-                   entryValue: value});
+                   entryValue: value,
+                   options:options});
       
     if (typeof(this.props.onChange) === "function")
         this.props.onChange(value);
